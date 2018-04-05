@@ -11,4 +11,7 @@ defmodule EventStore.Store do
     |> Context.get_all()
   end
 
+  def view(database, design_name, name),
+    do: Context.get_view(database, design_name, name)
+
 end

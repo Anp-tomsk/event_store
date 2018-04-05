@@ -2,7 +2,7 @@ defmodule EventStore.Couchdb.Context do
   alias EventStore.Couchdb.Packet
 
   def write_doc(database, doc) when is_map(doc), do:
-    write_doc(database, Packet.pack(doc))
+    write_doc(database, Packet.to_couch(doc))
   def write_doc(database, doc) when is_tuple(doc), do:
     write_doc(database, doc, Packet.valid_structure?(doc))
 
@@ -12,11 +12,17 @@ defmodule EventStore.Couchdb.Context do
   end
   def write_doc(_database, _doc, _valid), do: {:error, "Invalid document structure"}
 
-  def get_all(database) do
-    :couchbeam_view.all(database)
+  def get_view(database, design_name, name) do
+    :couchbeam_view.fetch(database, {design_name, name})
     |> fn {:ok, documents} ->
-      [_view_info | tail] = Packet.unpack!(documents)
-      {:ok, tail}
+      {:ok,  Packet.unpack!(documents)}
+    end.()
+  end
+
+  def get_all(database) do
+    :couchbeam_view.all(database, [:include_docs])
+    |> fn {:ok, documents} ->
+      {:ok,  Packet.unpack!(documents)}
     end.()
   end
 

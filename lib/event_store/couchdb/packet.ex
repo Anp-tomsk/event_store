@@ -10,14 +10,30 @@ defmodule EventStore.Couchdb.Packet do
      end.()
   end
 
+  def to_couch(%{:__struct__ => _struct} = struct),
+    do: struct
+      |> Map.from_struct()
+      |> pack()
+
+  def to_couch(map) when is_map(map),
+    do: map
+      |> Map.put(@id, UUID.uuid1())
+      |> pack()
+
   def pack(map) when is_map(map) do
     {
       map
-      |> Enum.map(fn {key, value} ->
-        {Atom.to_string(key), value}
-      end)
+      |> Enum.map(&(pack(&1)))
     }
   end
+
+  def pack({key, value}) when is_map(value),
+    do: {key, pack(value)}
+
+  def pack({key, value}) when is_atom(key),
+    do: { Atom.to_string(key), value }
+
+  def pack(value), do: value
 
   def unpack!(arr) when is_list(arr) do
     arr |> Enum.map(fn doc -> unpack!(doc) end)

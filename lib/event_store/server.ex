@@ -12,12 +12,22 @@ defmodule EventStore.Server do
   def init({url, name}), do:
     Database.connect(url, name)
 
-  def handle_cast({:store, event}, _from, database) do
+  def handle_cast({:store, event}, database) do
     Store.store(database, event)
+    |> handle_stored()
     {:noreply, database}
   end
 
   def handle_call(:all, _from, database), do:
     {:reply, database |> Store.all, database}
+
+  def handle_call({:view, design_name, name}, _from, database), do:
+    {:reply, Store.view(database, design_name, name), database}
+
+  defp handle_stored({:error, reason}),
+    do: IO.puts("An error occured for the following reason #{reason}")
+
+  defp handle_stored(_doc),
+    do: IO.puts("Succesfully stored document")
 
 end

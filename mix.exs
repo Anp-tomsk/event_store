@@ -22,7 +22,8 @@ defmodule EventStore.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:couchbeam, git: "https://github.com/benoitc/couchbeam.git"}
+      {:couchbeam, git: "https://github.com/benoitc/couchbeam.git"},
+      { :uuid, "~> 1.1" }
     ]
   end
 end
