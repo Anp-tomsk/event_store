@@ -10,7 +10,8 @@ use Mix.Config
 
 # You can configure your application as:
 #
-#     config :event_store, key: :value
+#
+     config :event_store, connection_string: "couchdb"
 #
 # and access this configuration in your application as:
 #

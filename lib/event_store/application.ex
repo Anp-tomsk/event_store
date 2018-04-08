@@ -6,7 +6,13 @@ defmodule EventStore.Application do
     import Supervisor.Spec
 
     children = [
-      worker(Server, ["http://127.0.0.1:5984", :store])
+      worker(
+      Server,
+      [
+        Application.get_env(:event_store, :connection_string),
+        :store
+       ]
+      )
     ]
 
     opts = [strategy: :one_for_one, name: StoreSupervisor]
